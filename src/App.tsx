@@ -649,6 +649,7 @@ export default function App() {
               isActive={isActive}
               isMuted={isMuted}
               theme={activeTheme}
+              isPremium={isPremium}
               onPowerToggle={handlePowerToggle}
               onMuteToggle={handleMuteToggle}
               onGainChange={handleGainChange}

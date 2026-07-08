@@ -52,7 +52,32 @@ export const PremiumSettingsDrawer: React.FC<PremiumSettingsDrawerProps> = ({
   soundstageMultiplier,
   onSoundstageMultiplierChange,
 }) => {
+  const [typedCode, setTypedCode] = React.useState('');
+  const [errorMsg, setErrorMsg] = React.useState('');
+  const [successMsg, setSuccessMsg] = React.useState('');
+
   if (!isOpen) return null;
+
+  const handleActivateClick = () => {
+    setErrorMsg('');
+    setSuccessMsg('');
+    const code = typedCode.trim().toUpperCase();
+    if (code === 'SAKIL' || code === 'SAKIL_PRO_MIC' || code === 'SAKIL_VIP_2026' || code === 'SAKIL-VIP-99') {
+      onPremiumToggle(true);
+      setSuccessMsg('🎉 VIP Premium Successful Activated! Golden Theme loaded.');
+      setTypedCode('');
+    } else if (!code) {
+      setErrorMsg('অনুগ্রহ করে একটি অ্যাক্টিভেশন কোড দিন। (Please enter an activation code)');
+    } else {
+      setErrorMsg('ভুল কোড! সঠিক কোড পেতে অ্যাপ মেকার SakiL khan এর সাথে যোগাযোগ করুন।');
+    }
+  };
+
+  const handleDeactivate = () => {
+    onPremiumToggle(false);
+    setSuccessMsg('');
+    setErrorMsg('');
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -112,8 +137,8 @@ export const PremiumSettingsDrawer: React.FC<PremiumSettingsDrawerProps> = ({
               </div>
             </div>
 
-            <p className="text-[11px] text-gray-300 leading-relaxed">
-              নতুন নতুন প্রফেশনাল স্পাই এবং অডিও রিসিভার আপডেট পেতে আমাদের অফিসিয়াল টেলিগ্রাম চ্যানেলে যুক্ত হয়ে যান!
+            <p className="text-[11px] text-gray-300 leading-relaxed font-sans">
+              নতুন প্রফেশনাল স্পাই অডিও রিসিভার, অ্যাক্টিভেশন কোড এবং আপডেট পেতে আমাদের অফিসিয়াল টেলিগ্রাম চ্যানেলে যুক্ত হয়ে যান!
             </p>
 
             <a 
@@ -123,16 +148,16 @@ export const PremiumSettingsDrawer: React.FC<PremiumSettingsDrawerProps> = ({
               className="flex items-center justify-center gap-2 w-full py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white text-xs font-bold rounded-xl transition-all shadow-[0_4px_15px_rgba(6,182,212,0.3)] active:scale-98"
             >
               <Send className="w-4 h-4 shrink-0 animate-bounce" />
-              <span>টেলিগ্রামে জয়েন করুন (Join Channel)</span>
+              <span>টেলিগ্রামে জয়েন করুন (Join Telegram)</span>
             </a>
           </div>
 
           {/* ========================================================
               PREMIUM VERSION ENABLE (TOGGLE SECTION)
-              ======================================================== */}
+              ======================================================= */}
           <div className={`p-4 rounded-2xl border transition-all ${
             isPremium 
-              ? 'bg-gradient-to-tr from-yellow-950/30 to-amber-950/20 border-yellow-500/30' 
+              ? 'bg-gradient-to-tr from-yellow-950/30 to-amber-950/20 border-yellow-500/30 shadow-[0_0_15px_rgba(234,179,8,0.15)]' 
               : 'bg-black/45 border-white/5'
           }`}>
             <div className="flex items-center justify-between mb-3">
@@ -140,34 +165,93 @@ export const PremiumSettingsDrawer: React.FC<PremiumSettingsDrawerProps> = ({
                 <Crown className={`w-5 h-5 ${isPremium ? 'text-yellow-400 animate-spin-slow' : 'text-gray-400'}`} />
                 <div>
                   <h3 className="text-xs font-extrabold uppercase text-white tracking-wider">
-                    Premium Version Status
+                    Premium VIP Status
                   </h3>
                   <span className={`text-[9px] font-mono uppercase font-bold px-1.5 py-0.5 rounded ${
                     isPremium ? 'bg-yellow-500/20 text-yellow-300' : 'bg-gray-800 text-gray-400'
                   }`}>
-                    {isPremium ? '💎 ACTIVE VIP UNLOCKED' : '🔒 STANDARD VERSION'}
+                    {isPremium ? '💎 ACTIVE VIP UNLOCKED' : '🔒 STANDARD VERSION (LOCKED)'}
                   </span>
                 </div>
               </div>
 
-              {/* IOS Styled Switch */}
-              <button
-                onClick={() => onPremiumToggle(!isPremium)}
-                className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none flex items-center ${
-                  isPremium ? 'bg-yellow-500' : 'bg-gray-800'
-                }`}
-              >
-                <div className={`bg-black w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 flex items-center justify-center ${
-                  isPremium ? 'translate-x-6' : 'translate-x-0'
-                }`}>
-                  <div className={`w-1.5 h-1.5 rounded-full ${isPremium ? 'bg-yellow-400' : 'bg-gray-600'}`} />
-                </div>
-              </button>
+              {isPremium && (
+                <button
+                  onClick={handleDeactivate}
+                  className="px-2.5 py-1 bg-red-600/20 hover:bg-red-600/40 text-red-400 text-[10px] font-bold rounded-lg border border-red-500/20 transition-all active:scale-95 uppercase"
+                >
+                  Lock Pro
+                </button>
+              )}
             </div>
 
-            <p className="text-[10px] text-gray-400 leading-relaxed">
-              প্রিমিয়াম মোড সক্রিয় করলে সম্পূর্ণ ইন্টারফেস গোল্ডেন থিমে রূপান্তরিত হবে, এবং কসমিক ৩ডি স্টেরিও সাউন্ডস্টেজ ও এনক্রিপশন স্পেসিফিকেশনসমূহ আনলক হবে।
-            </p>
+            {/* If NOT premium, show beautiful Activation Lock overlay */}
+            {!isPremium ? (
+              <div className="mt-3 pt-3 border-t border-white/5 space-y-3.5">
+                <div className="p-3 bg-red-950/20 border border-red-500/20 rounded-xl text-xs text-red-200">
+                  <p className="font-bold mb-1">🔒 VIP Premium ফিচারসমূহ লক করা আছে!</p>
+                  <p className="text-[10px] leading-relaxed opacity-90">
+                    প্রিমিয়াম অ্যাক্টিভেট করলে আপনি পাবেন: ৩ডি কসমিক সাউন্ডস্টেজ, এক্সট্রিম ইয়ার স্প্লিটার হাই-গেইন এমপ্লিফায়ার বুস্ট (12x MAX), পেশাদার নয়েজ গেট এবং ল্যাগ-মুক্ত হাই-কোয়ালিটি লাইভ সাউন্ড, যা হেডফোন কানেক্ট করলেই কান ফেটে যাওয়ার মতো লাউড ও ক্রিস্টাল ক্লিয়ার সাউন্ড প্রদান করবে!
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
+                    Enter VIP Activation Key (অ্যাক্টিভেশন কোড দিন)
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={typedCode}
+                      onChange={(e) => setTypedCode(e.target.value)}
+                      placeholder="অ্যাক্টিভেশন পাসওয়ার্ড বা কোড দিন..."
+                      className="flex-1 text-xs px-3 py-2 rounded-xl bg-black border border-white/10 text-white font-mono outline-none focus:border-yellow-500/30"
+                    />
+                    <button
+                      onClick={handleActivateClick}
+                      className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-black text-xs font-extrabold rounded-xl transition-all shadow-[0_0_12px_rgba(234,179,8,0.3)] active:scale-95"
+                    >
+                      Unlock
+                    </button>
+                  </div>
+                  {errorMsg && (
+                    <p className="text-[10px] font-bold text-red-400 bg-red-950/30 px-2 py-1 rounded border border-red-500/10">
+                      ⚠️ {errorMsg}
+                    </p>
+                  )}
+                  {successMsg && (
+                    <p className="text-[10px] font-bold text-green-400 bg-green-950/30 px-2 py-1 rounded border border-green-500/10">
+                      {successMsg}
+                    </p>
+                  )}
+                </div>
+
+                <div className="text-center pt-1">
+                  <p className="text-[10px] text-gray-400">
+                    কোড পেতে অথবা প্রিমিয়াম মোড কিনতে সরাসরি ডেভেলাপার বা মেকার <span className="text-yellow-400 font-bold underline">SakiL khan</span> এর সাথে টেলিগ্রামে যোগাযোগ করুন!
+                  </p>
+                  <a
+                    href="https://t.me/Sharechat_ns_098"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-bold text-white transition active:scale-95"
+                  >
+                    <Send className="w-3 h-3 text-cyan-400" />
+                    Contact App Maker (SakiL Khan)
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-xs text-yellow-200">
+                <p className="font-bold flex items-center gap-1 text-yellow-400">
+                  <Sparkles className="w-4 h-4 text-yellow-400 animate-spin-slow" /> 
+                  💎 VIP PREMIUM FEATURES UNLOCKED!
+                </p>
+                <p className="text-[10px] leading-relaxed opacity-90 mt-1">
+                  সমস্ত প্রফেশনাল সাউন্ডস্টেজ মাল্টিপ্লায়ার, আল্ট্রা-গেইন এমপ্লিফায়ার বুস্ট (১২ গুন পর্যন্ত), এবং ভিআইপি গোল্ডেন থিম সফলভাবে সক্রিয় করা হয়েছে। ধন্যবাদ SakiL Khan VIP Studio ব্যবহার করার জন্য!
+                </p>
+              </div>
+            )}
           </div>
 
           {/* ========================================================

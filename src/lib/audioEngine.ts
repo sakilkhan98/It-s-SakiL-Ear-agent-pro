@@ -185,20 +185,33 @@ export class AudioEngine {
         latencyHint: this.devSettings.latencyHint,
       });
 
+      // Resume context if suspended (crucial for WebViews/Android Chrome)
+      if (this.ctx.state === 'suspended') {
+        await this.ctx.resume();
+      }
+
       // Adaptive Microphone Constraints:
       // If we use 'studioHighFi' mode, we completely turn OFF native browser echo cancellation,
       // noise suppression, and auto gain. This bypasses the compressed zoom-like vocal sound
       // and retrieves full-bandwidth 48kHz raw mic signals, perfect for studio headphones!
       const rawStudioMic = !!this.preset.studioHighFi;
 
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: rawStudioMic ? false : this.devSettings.echoCancellation,
-          noiseSuppression: rawStudioMic ? false : this.devSettings.noiseSuppression,
-          autoGainControl: rawStudioMic ? false : this.devSettings.autoGainControl,
-        },
-        video: false
-      });
+      try {
+        this.stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: rawStudioMic ? false : this.devSettings.echoCancellation,
+            noiseSuppression: rawStudioMic ? false : this.devSettings.noiseSuppression,
+            autoGainControl: rawStudioMic ? false : this.devSettings.autoGainControl,
+          },
+          video: false
+        });
+      } catch (err) {
+        console.warn("Primary getUserMedia with advanced constraints failed, retrying with fallback simple constraints", err);
+        this.stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: false
+        });
+      }
 
       this.source = this.ctx.createMediaStreamSource(this.stream);
 
@@ -400,16 +413,16 @@ export class AudioEngine {
           this.eqFilters[4].gain.setValueAtTime(this.preset.eq14000, this.ctx.currentTime);
         }
       } else {
-        // Wired headphones / High-fidelity pro monitor: load standard preset gains perfectly
+        // Wired headphones / High-fidelity pro monitor: load standard preset gains with heavy bass and treble boost for high impact live earphone monitoring!
         if (this.highPassFilter) {
           this.highPassFilter.frequency.setValueAtTime(this.devSettings.highPassFilterFreq, this.ctx.currentTime);
         }
         if (this.eqFilters.length === 5) {
-          this.eqFilters[0].gain.setValueAtTime(this.preset.eq60, this.ctx.currentTime);
-          this.eqFilters[1].gain.setValueAtTime(this.preset.eq230, this.ctx.currentTime);
-          this.eqFilters[2].gain.setValueAtTime(this.preset.eq910, this.ctx.currentTime);
-          this.eqFilters[3].gain.setValueAtTime(this.preset.eq3600, this.ctx.currentTime);
-          this.eqFilters[4].gain.setValueAtTime(this.preset.eq14000, this.ctx.currentTime);
+          this.eqFilters[0].gain.setValueAtTime(this.preset.eq60 + 10, this.ctx.currentTime);  // Heavy Bass boost
+          this.eqFilters[1].gain.setValueAtTime(this.preset.eq230 + 5, this.ctx.currentTime);  // Thick body mid-bass
+          this.eqFilters[2].gain.setValueAtTime(this.preset.eq910 + 2, this.ctx.currentTime);  // Vocal presence
+          this.eqFilters[3].gain.setValueAtTime(this.preset.eq3600 + 4, this.ctx.currentTime); // Crystal-clear highs
+          this.eqFilters[4].gain.setValueAtTime(this.preset.eq14000 + 6, this.ctx.currentTime);// Ultra airy high-end
         }
       }
       this.reconnectDSP();

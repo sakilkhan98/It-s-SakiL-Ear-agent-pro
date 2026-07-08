@@ -1,12 +1,13 @@
 import React from 'react';
 import { AudioPreset, ThemeConfig } from '../types';
-import { Power, VolumeX, Volume2, ShieldAlert, Sparkles, Zap, Radio, Music } from 'lucide-react';
+import { Power, VolumeX, Volume2, ShieldAlert, Sparkles, Zap, Radio, Music, Crown } from 'lucide-react';
 
 interface EqualizerControlsProps {
   preset: AudioPreset;
   isActive: boolean;
   isMuted: boolean;
   theme: ThemeConfig;
+  isPremium: boolean;
   onPowerToggle: () => void;
   onMuteToggle: () => void;
   onGainChange: (val: number) => void;
@@ -21,6 +22,7 @@ export const EqualizerControls: React.FC<EqualizerControlsProps> = ({
   isActive,
   isMuted,
   theme,
+  isPremium,
   onPowerToggle,
   onMuteToggle,
   onGainChange,
@@ -58,10 +60,17 @@ export const EqualizerControls: React.FC<EqualizerControlsProps> = ({
             <input
               type="range"
               min="0.5"
-              max="5.0"
+              max={isPremium ? "12.0" : "5.0"}
               step="0.1"
               value={preset.gain}
-              onChange={(e) => onGainChange(parseFloat(e.target.value))}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                if (!isPremium && val > 5.0) {
+                  onGainChange(5.0);
+                } else {
+                  onGainChange(val);
+                }
+              }}
               className="vertical-range accent-red-500 bg-black/40 h-36 rounded-lg appearance-none cursor-pointer"
               style={{
                 writingMode: 'bt-lr',
@@ -74,18 +83,24 @@ export const EqualizerControls: React.FC<EqualizerControlsProps> = ({
               <div 
                 className="absolute bottom-0 left-0 right-0 rounded-full" 
                 style={{ 
-                  top: `${100 - ((preset.gain - 0.5) / 4.5) * 100}%`,
+                  top: `${100 - ((preset.gain - 0.5) / (isPremium ? 11.5 : 4.5)) * 100}%`,
                   backgroundColor: theme.primary 
                 }} 
+                id="gain-track-highlight"
               />
             </div>
           </div>
-          <span className="text-xs font-bold tracking-wider uppercase mt-3" style={{ color: theme.primary }}>
-            Gain / বুস্ট
+          <span className="text-xs font-bold tracking-wider uppercase mt-3 flex items-center gap-1" style={{ color: theme.primary }}>
+            Gain / বুস্ট {!isPremium && <Crown className="w-3 h-3 text-yellow-400" />}
           </span>
           <span className="text-[10px] font-mono mt-0.5 text-gray-400">
-            {preset.gain.toFixed(1)}x
+            {preset.gain.toFixed(1)}x {isPremium && '🔥 VIP MAX'}
           </span>
+          {!isPremium && (
+            <span className="text-[8px] text-yellow-400 bg-yellow-500/10 px-1 py-0.5 rounded mt-1 font-mono font-bold tracking-tighter">
+              LOCK MAX 12x
+            </span>
+          )}
         </div>
 
         {/* CENTER: BIG METALLIC POWER BUTTON */}
