@@ -1,0 +1,6 @@
+{
+  "name": "Ear Agent Microphone",
+  "description": "High-fidelity real-time microphone amplifier with noise cancellation, multi-band equalizer, DSP compressor, encrypted tape recording, and cloud sync.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
