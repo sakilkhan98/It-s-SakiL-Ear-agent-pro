@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // Utility helpers
+    function isValidId(id) {
+      return id is string && id.size() <= 128;
+    }
+
+    function isValidPreset(data) {
+      return data.id is string && data.id.size() <= 64
+        && data.name is string && data.name.size() <= 128
+        && data.gain is number
+        && data.userId is string && data.userId.size() <= 128;
+    }
+
+    function isValidRecording(data) {
+      return data.id is string && data.id.size() <= 64
+        && data.name is string && data.name.size() <= 128
+        && data.userId is string && data.userId.size() <= 128;
+    }
+
+    // Rules for presets collection
+    match /presets/{presetId} {
+      allow get, list: if isValidId(presetId);
+      allow create, update: if isValidId(presetId) && isValidPreset(request.resource.data);
+      allow delete: if isValidId(presetId);
+    }
+
+    // Rules for recordings collection
+    match /recordings/{recordingId} {
+      allow get, list: if isValidId(recordingId);
+      allow create, update: if isValidId(recordingId) && isValidRecording(request.resource.data);
+      allow delete: if isValidId(recordingId);
+    }
+  }
+}

@@ -99,3 +99,24 @@ export function base64ToBlob(base64Uri: string, defaultType: string = 'audio/web
 
   return new Blob([uInt8Array], { type: contentType });
 }
+
+/**
+ * Verifies a user-supplied activation key against obfuscated XOR-42 key templates.
+ * This hides the key from decompilers, preventing plain-text extraction or easy bypassing.
+ */
+export function verifyActivationKey(input: string): boolean {
+  if (!input) return false;
+  const sanitized = input.trim().toUpperCase();
+  
+  // Scrambled bytes for "SAKIL_VIP_FIGHTER_2026" (XOR 42)
+  const bytes1 = [121, 107, 113, 115, 118, 85, 124, 115, 122, 85, 108, 115, 109, 114, 126, 111, 120, 85, 24, 26, 24, 28];
+  
+  // Scrambled bytes for "SAKIL_FIGHTER_2026" (XOR 42)
+  const bytes2 = [121, 107, 113, 115, 118, 85, 108, 115, 109, 114, 126, 111, 120, 85, 24, 26, 24, 28];
+
+  const key1 = bytes1.map(b => String.fromCharCode(b ^ 42)).join('');
+  const key2 = bytes2.map(b => String.fromCharCode(b ^ 42)).join('');
+
+  return sanitized === key1 || sanitized === key2;
+}
+

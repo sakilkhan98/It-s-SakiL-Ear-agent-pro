@@ -1,0 +1,57 @@
+{
+  "entities": {
+    "Preset": {
+      "title": "Audio Preset",
+      "description": "Custom equalizer and amplifier audio preset details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "isCustom": { "type": "boolean" },
+        "gain": { "type": "number" },
+        "eq60": { "type": "number" },
+        "eq230": { "type": "number" },
+        "eq910": { "type": "number" },
+        "eq3600": { "type": "number" },
+        "eq14000": { "type": "number" },
+        "noiseCancellation": { "type": "boolean" },
+        "noiseGateThreshold": { "type": "number" },
+        "compressorEnabled": { "type": "boolean" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["id", "name", "gain", "userId"]
+    },
+    "Recording": {
+      "title": "Recording",
+      "description": "Recorded live audio track metadata and encoded audio data uri",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "duration": { "type": "number" },
+        "presetName": { "type": "string" },
+        "fileSize": { "type": "number" },
+        "isCloudSynced": { "type": "boolean" },
+        "encrypted": { "type": "boolean" },
+        "shareCode": { "type": "string" },
+        "audioDataUri": { "type": "string" },
+        "userId": { "type": "string" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["id", "name", "timestamp", "duration", "audioDataUri", "userId"]
+    }
+  },
+  "firestore": {
+    "/presets/{presetId}": {
+      "schema": "Preset",
+      "description": "User custom audio equalizer and soundstage presets"
+    },
+    "/recordings/{recordingId}": {
+      "schema": "Recording",
+      "description": "User recorded live audio sound clips"
+    }
+  }
+}

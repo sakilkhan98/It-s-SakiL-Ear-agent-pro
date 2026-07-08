@@ -1,5 +1,6 @@
 import React from 'react';
 import { ThemeConfig, AudioRoutingMode } from '../types';
+import { verifyActivationKey } from '../lib/crypto';
 import { 
   X, 
   Crown, 
@@ -61,10 +62,10 @@ export const PremiumSettingsDrawer: React.FC<PremiumSettingsDrawerProps> = ({
   const handleActivateClick = () => {
     setErrorMsg('');
     setSuccessMsg('');
-    const code = typedCode.trim().toUpperCase();
-    if (code === 'SAKIL' || code === 'SAKIL_PRO_MIC' || code === 'SAKIL_VIP_2026' || code === 'SAKIL-VIP-99') {
+    const code = typedCode.trim();
+    if (verifyActivationKey(code)) {
       onPremiumToggle(true);
-      setSuccessMsg('🎉 VIP Premium Successful Activated! Golden Theme loaded.');
+      setSuccessMsg('🎉 VIP Premium Successfully Activated! Golden Theme loaded.');
       setTypedCode('');
     } else if (!code) {
       setErrorMsg('অনুগ্রহ করে একটি অ্যাক্টিভেশন কোড দিন। (Please enter an activation code)');

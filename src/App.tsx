@@ -25,6 +25,7 @@ import { PresetsManager } from './components/PresetsManager';
 import { RecordingsList } from './components/RecordingsList';
 import { DeveloperMenu } from './components/DeveloperMenu';
 import { PremiumSettingsDrawer } from './components/PremiumSettingsDrawer';
+import { WelcomePopup } from './components/WelcomePopup';
 import { 
   Keyboard, 
   VolumeX, 
@@ -76,6 +77,7 @@ export default function App() {
   // Interactive UI Modal triggers
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   // References
   const audioEngineRef = useRef<AudioEngine | null>(null);
@@ -823,6 +825,15 @@ export default function App() {
         onEncryptionKeyChange={setCustomEncryptionKey}
         soundstageMultiplier={soundstageMultiplier}
         onSoundstageMultiplierChange={handleSoundstageMultiplierChange}
+      />
+
+      {/* 4. PREMIUM WELCOME POPUP ON STARTUP */}
+      <WelcomePopup
+        isOpen={showWelcome}
+        onClose={() => setShowWelcome(false)}
+        onPremiumUnlock={() => handlePremiumToggle(true)}
+        theme={activeTheme}
+        isPremium={isPremium}
       />
 
     </div>
